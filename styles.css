@@ -18,7 +18,7 @@
   --reader-line-height: 1.95;
   --reader-letter-spacing: 0px;
   --reader-width: 760px;
-  --shadow: 0 20px 70px rgba(65, 99, 125, .11);
+  --shadow: 0 20px 70px rgba(65, 99, 125, .11);\n  --scene-bg: radial-gradient(circle at 15% 5%, rgba(164, 218, 250, .42), transparent 32rem), radial-gradient(circle at 86% 14%, rgba(209, 198, 247, .34), transparent 34rem), linear-gradient(180deg, var(--page-bg), var(--page-bg-2));\n  --glass-refraction-opacity: .14;
 }
 
 * { box-sizing: border-box; }
@@ -98,6 +98,50 @@ input, select, textarea { color: inherit; }
   mix-blend-mode: screen;
 }
 .liquid > * { position: relative; z-index: 1; }
+
+.liquid.refractive {
+  isolation: isolate;
+}
+
+.liquid.refractive::before {
+  z-index: 0;
+  inset: -28px;
+  border-radius: calc(var(--glass-radius) + 24px);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.18), transparent 34%, rgba(180,220,246,.08)),
+    var(--scene-bg);
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  filter: url("#aire-liquid-filter");
+  opacity: var(--glass-refraction-opacity);
+  transform: scale(1.025);
+}
+
+.liquid.refractive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 1px 0 rgba(255, 92, 129, .15),
+    inset -1px 0 rgba(72, 221, 255, .16),
+    inset 0 1px rgba(255,255,255,.52),
+    inset 0 -14px 28px rgba(255,255,255,.06);
+  mix-blend-mode: screen;
+}
+
+@supports (backdrop-filter: url("#aire-liquid-filter")) or (-webkit-backdrop-filter: url("#aire-liquid-filter")) {
+  .liquid.refractive {
+    -webkit-backdrop-filter: url("#aire-liquid-filter") blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    backdrop-filter: url("#aire-liquid-filter") blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+  .liquid.refractive::before {
+    opacity: calc(var(--glass-refraction-opacity) * .32);
+  }
+}
 
 .app-shell {
   width: min(1040px, calc(100% - 24px));
