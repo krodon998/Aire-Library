@@ -15,7 +15,7 @@
   <div class="aurora aurora-c"></div>
 
   <main class="app-shell">
-    <header class="app-header liquid">
+    <header class="app-header liquid refractive">
       <div>
         <p class="eyebrow">Aire Library</p>
         <h1 id="pageTitle">存所</h1>
@@ -177,7 +177,7 @@
             <label class="setting-row range-row"><span>模糊 <b id="glassBlurValue"></b></span><input id="glassBlurSetting" type="range" min="4" max="42" step="1" /></label>
             <label class="setting-row range-row"><span>透明 <b id="glassOpacityValue"></b></span><input id="glassOpacitySetting" type="range" min="0.18" max="0.88" step="0.02" /></label>
             <label class="setting-row range-row"><span>饱和 <b id="glassSaturationValue"></b></span><input id="glassSaturationSetting" type="range" min="80" max="220" step="5" /></label>
-            <label class="setting-row range-row"><span>高光 <b id="glassHighlightValue"></b></span><input id="glassHighlightSetting" type="range" min="0.08" max="0.8" step="0.02" /></label>
+            <label class="setting-row range-row"><span>高光 <b id="glassHighlightValue"></b></span><input id="glassHighlightSetting" type="range" min="0.08" max="0.8" step="0.02" /></label>\n            <label class="setting-row range-row"><span>折射 <b id="glassRefractionValue"></b></span><input id="glassRefractionSetting" type="range" min="0" max="18" step="1" /></label>
             <label class="setting-row range-row"><span>圆角 <b id="glassRadiusValue"></b></span><input id="glassRadiusSetting" type="range" min="10" max="38" step="1" /></label>
             <label class="setting-row stacked"><span>玻璃染色</span><input id="glassTintSetting" type="color" value="#dcefff" /></label>
           </div>
@@ -200,7 +200,7 @@
     </section>
   </main>
 
-  <nav class="bottom-nav liquid" aria-label="主导航">
+  <nav class="bottom-nav liquid refractive" aria-label="主导航">
     <button class="nav-item active" data-view="store" type="button">
       <span class="nav-icon">▤</span><span>存所</span>
     </button>
@@ -237,7 +237,7 @@
   </section>
 
   <section id="readerView" class="reader-view hidden">
-    <header class="reader-topbar liquid">
+    <header class="reader-topbar liquid refractive">
       <button id="readerBackButton" class="ghost-button" type="button">返回</button>
       <div class="reader-heading">
         <p id="readerMeta" class="eyebrow"></p>
@@ -251,7 +251,7 @@
 
     <article id="readerPaper" class="reader-paper"></article>
 
-    <footer class="reader-footer liquid">
+    <footer class="reader-footer liquid refractive">
       <button id="readerPrevButton" class="ghost-button" type="button">上一页</button>
       <button id="readerChapterButton" class="ghost-button" type="button">目录</button>
       <button id="readerNextButton" class="primary-button" type="button">下一页</button>
