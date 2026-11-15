@@ -94,7 +94,7 @@ const ui = {
   glassHighlightValue: $("glassHighlightValue"),
   glassRadiusSetting: $("glassRadiusSetting"),
   glassRadiusValue: $("glassRadiusValue"),
-  glassTintSetting: $("glassTintSetting"),
+  glassTintSetting: $("glassTintSetting"),\n  glassRefractionSetting: $("glassRefractionSetting"),\n  glassRefractionValue: $("glassRefractionValue"),
   exportDataButton: $("exportDataButton"),
   createFolderButton: $("createFolderButton"),
 };
@@ -139,6 +139,52 @@ const state = {
   highlightColor: "blue",
   settings: loadSettings(),
 };
+
+function ensureGlassFilter() {
+  if (document.getElementById("aire-liquid-filter-root")) return;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.id = "aire-liquid-filter-root";
+  svg.setAttribute("width", "0");
+  svg.setAttribute("height", "0");
+  svg.setAttribute("aria-hidden", "true");
+  svg.style.position = "fixed";
+  svg.style.pointerEvents = "none";
+
+  const defs = document.createElementNS(ns, "defs");
+  const filter = document.createElementNS(ns, "filter");
+  filter.id = "aire-liquid-filter";
+  filter.setAttribute("x", "-25%");
+  filter.setAttribute("y", "-25%");
+  filter.setAttribute("width", "150%");
+  filter.setAttribute("height", "150%");
+
+  const noise = document.createElementNS(ns, "feTurbulence");
+  noise.setAttribute("type", "fractalNoise");
+  noise.setAttribute("baseFrequency", "0.008 0.012");
+  noise.setAttribute("numOctaves", "2");
+  noise.setAttribute("seed", "11");
+  noise.setAttribute("result", "noise");
+
+  const displacement = document.createElementNS(ns, "feDisplacementMap");
+  displacement.id = "aire-glass-displacement";
+  displacement.setAttribute("in", "SourceGraphic");
+  displacement.setAttribute("in2", "noise");
+  displacement.setAttribute("scale", String(state.settings.glass.refraction ?? 14));
+  displacement.setAttribute("xChannelSelector", "R");
+  displacement.setAttribute("yChannelSelector", "B");
+
+  filter.append(noise, displacement);
+  defs.append(filter);
+  svg.append(defs);
+  document.body.prepend(svg);
+}
+
+function updateGlassFilter(scale) {
+  const displacement = document.getElementById("aire-glass-displacement");
+  if (displacement) displacement.setAttribute("scale", String(Math.max(0, Math.min(18, Number(scale) || 0))));
+  document.documentElement.style.setProperty("--glass-refraction-opacity", String((Math.max(0, Math.min(18, Number(scale) || 0)) / 18) * 0.18));
+}
 
 function cloneDefaults() {
   return JSON.parse(JSON.stringify(defaultSettings));
@@ -214,7 +260,7 @@ function populateSettingsUi() {
   ui.glassHighlightValue.textContent = `${Math.round(s.glass.highlight * 100)}%`;
   ui.glassRadiusSetting.value = s.glass.radius;
   ui.glassRadiusValue.textContent = `${s.glass.radius}px`;
-  ui.glassTintSetting.value = s.glass.tint;
+  ui.glassTintSetting.value = s.glass.tint;\n  ui.glassRefractionSetting.value = s.glass.refraction;\n  ui.glassRefractionValue.textContent = String(s.glass.refraction);
 }
 
 function toast(message, duration = 2400) {
@@ -933,7 +979,7 @@ function bindSettings() {
   bind(ui.glassSaturationSetting, (el) => state.settings.glass.saturation = Number(el.value));
   bind(ui.glassHighlightSetting, (el) => state.settings.glass.highlight = Number(el.value));
   bind(ui.glassRadiusSetting, (el) => state.settings.glass.radius = Number(el.value));
-  bind(ui.glassTintSetting, (el) => state.settings.glass.tint = el.value);
+  bind(ui.glassTintSetting, (el) => state.settings.glass.tint = el.value);\n  bind(ui.glassRefractionSetting, (el) => state.settings.glass.refraction = Number(el.value));
 
   const presets = {
     clear: { blur: 12, opacity: 0.30, saturation: 125, highlight: 0.60, radius: 22, tint: "#e9f7ff" },
