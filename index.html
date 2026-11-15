@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#eaf6ff" />
+  <meta name="color-scheme" content="light" />
+  <title>Aire Library</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <main class="shell">
+    <header class="topbar glass">
+      <div>
+        <p class="eyebrow">Aire Library</p>
+        <h1>我们的共读图书馆</h1>
+        <p class="subtitle">先一起找到一本书，再慢慢读下去。</p>
+      </div>
+      <button id="resumeButton" class="soft-button hidden" type="button">继续上次阅读</button>
+    </header>
+
+    <section id="libraryView" class="view">
+      <div class="search-card glass">
+        <form id="searchForm" class="search-row">
+          <input id="searchInput" type="search" autocomplete="off" placeholder="书名或作者，例如 Jane Austen" />
+          <button id="searchButton" class="primary-button" type="submit">找书</button>
+        </form>
+        <div class="search-actions">
+          <button id="popularButton" class="soft-button" type="button">随便逛逛</button>
+          <span id="statusText" class="status">书源：Project Gutenberg</span>
+        </div>
+      </div>
+
+      <section id="resultsSection" class="results-section hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bookshelf</p>
+            <h2>找到这些</h2>
+          </div>
+          <span id="resultMeta" class="status"></span>
+        </div>
+        <div id="resultsGrid" class="book-grid"></div>
+      </section>
+
+      <section class="welcome glass">
+        <p class="eyebrow">Shared reading</p>
+        <h2>这不是一个孤零零的阅读器。</h2>
+        <p>
+          阅读进度、划线和讨论会一点点接进我们的共同状态里。
+          v0.1 先把“找书 → 阅读 → 划线”的手感做顺。
+        </p>
+      </section>
+    </section>
+
+    <section id="readerView" class="view hidden">
+      <div class="reader-toolbar glass">
+        <button id="backButton" class="soft-button" type="button">返回书架</button>
+        <div class="reader-title-wrap">
+          <p id="readerBookMeta" class="eyebrow"></p>
+          <h2 id="readerTitle">Reading</h2>
+          <p id="readerProgressText" class="status"></p>
+        </div>
+        <button id="highlightsToggle" class="soft-button" type="button">划线 <span id="highlightCount">0</span></button>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <article id="readerText" class="reader-paper glass" tabindex="0"></article>
+
+      <div class="reader-controls glass">
+        <button id="previousButton" class="soft-button" type="button">上一段</button>
+        <button id="nextButton" class="primary-button" type="button">继续读</button>
+      </div>
+
+      <aside id="highlightsPanel" class="highlights-panel glass hidden">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">Highlights</p>
+            <h3>这一页留下的痕迹</h3>
+          </div>
+          <button id="closeHighlights" class="icon-button" type="button" aria-label="关闭">×</button>
+        </div>
+        <p class="status">目前先保存在本机。下一步接入 Supabase 后，这里会变成我们的共享划线。</p>
+        <div id="highlightList" class="highlight-list"></div>
+      </aside>
+
+      <button id="selectionAction" class="selection-action hidden" type="button">划下来</button>
+    </section>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
