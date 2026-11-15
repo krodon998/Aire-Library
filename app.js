@@ -94,7 +94,9 @@ const ui = {
   glassHighlightValue: $("glassHighlightValue"),
   glassRadiusSetting: $("glassRadiusSetting"),
   glassRadiusValue: $("glassRadiusValue"),
-  glassTintSetting: $("glassTintSetting"),\n  glassRefractionSetting: $("glassRefractionSetting"),\n  glassRefractionValue: $("glassRefractionValue"),
+  glassTintSetting: $("glassTintSetting"),
+  glassRefractionSetting: $("glassRefractionSetting"),
+  glassRefractionValue: $("glassRefractionValue"),
   exportDataButton: $("exportDataButton"),
   createFolderButton: $("createFolderButton"),
 };
@@ -120,6 +122,7 @@ const defaultSettings = {
     highlight: 0.46,
     radius: 24,
     tint: "#dcefff",
+    refraction: 14,
   },
 };
 
@@ -228,6 +231,7 @@ function applySettings() {
   root.style.setProperty("--glass-highlight", String(s.glass.highlight));
   root.style.setProperty("--glass-radius", `${s.glass.radius}px`);
   root.style.setProperty("--glass-tint", s.glass.tint);
+  updateGlassFilter(s.glass.refraction);
 
   populateSettingsUi();
   if (state.reader) renderReader();
@@ -260,7 +264,9 @@ function populateSettingsUi() {
   ui.glassHighlightValue.textContent = `${Math.round(s.glass.highlight * 100)}%`;
   ui.glassRadiusSetting.value = s.glass.radius;
   ui.glassRadiusValue.textContent = `${s.glass.radius}px`;
-  ui.glassTintSetting.value = s.glass.tint;\n  ui.glassRefractionSetting.value = s.glass.refraction;\n  ui.glassRefractionValue.textContent = String(s.glass.refraction);
+  ui.glassTintSetting.value = s.glass.tint;
+  ui.glassRefractionSetting.value = s.glass.refraction;
+  ui.glassRefractionValue.textContent = String(s.glass.refraction);
 }
 
 function toast(message, duration = 2400) {
@@ -979,12 +985,13 @@ function bindSettings() {
   bind(ui.glassSaturationSetting, (el) => state.settings.glass.saturation = Number(el.value));
   bind(ui.glassHighlightSetting, (el) => state.settings.glass.highlight = Number(el.value));
   bind(ui.glassRadiusSetting, (el) => state.settings.glass.radius = Number(el.value));
-  bind(ui.glassTintSetting, (el) => state.settings.glass.tint = el.value);\n  bind(ui.glassRefractionSetting, (el) => state.settings.glass.refraction = Number(el.value));
+  bind(ui.glassTintSetting, (el) => state.settings.glass.tint = el.value);
+  bind(ui.glassRefractionSetting, (el) => state.settings.glass.refraction = Number(el.value));
 
   const presets = {
-    clear: { blur: 12, opacity: 0.30, saturation: 125, highlight: 0.60, radius: 22, tint: "#e9f7ff" },
+    clear: { blur: 12, opacity: 0.30, saturation: 125, highlight: 0.60, radius: 22, tint: "#e9f7ff", refraction: 8 },
     soft: { ...defaultSettings.glass },
-    deep: { blur: 34, opacity: 0.68, saturation: 180, highlight: 0.35, radius: 27, tint: "#cfe9fb" },
+    deep: { blur: 34, opacity: 0.68, saturation: 180, highlight: 0.35, radius: 27, tint: "#cfe9fb", refraction: 16 },
   };
   $$("[data-glass-preset]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1072,6 +1079,7 @@ ui.resumeButton.addEventListener("click", () => {
 ui.createFolderButton.addEventListener("click", createFolder);
 ui.exportDataButton.addEventListener("click", exportData);
 
+ensureGlassFilter();
 bindSettings();
 applySettings();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
