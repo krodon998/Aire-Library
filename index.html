@@ -1,98 +1,284 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="auto">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#eaf6ff" />
-  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#dff1ff" />
+  <meta name="color-scheme" content="light dark" />
   <title>Aire Library</title>
   <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
-  <div class="ambient ambient-a"></div>
-  <div class="ambient ambient-b"></div>
+  <div class="aurora aurora-a"></div>
+  <div class="aurora aurora-b"></div>
+  <div class="aurora aurora-c"></div>
 
-  <main class="shell">
-    <header class="topbar glass">
+  <main class="app-shell">
+    <header class="app-header liquid">
       <div>
         <p class="eyebrow">Aire Library</p>
-        <h1>我们的共读图书馆</h1>
-        <p class="subtitle">先一起找到一本书，再慢慢读下去。</p>
+        <h1 id="pageTitle">存所</h1>
+        <p id="pageSubtitle" class="subtitle">书和我们一起留下的东西。</p>
       </div>
-      <button id="resumeButton" class="soft-button hidden" type="button">继续上次阅读</button>
+      <button id="resumeButton" class="ghost-button hidden" type="button">继续阅读</button>
     </header>
 
-    <section id="libraryView" class="view">
-      <div class="search-card glass">
-        <form id="searchForm" class="search-row">
-          <input id="searchInput" type="search" autocomplete="off" placeholder="书名或作者，例如 Jane Austen" />
-          <button id="searchButton" class="primary-button" type="submit">找书</button>
-        </form>
-        <div class="search-actions">
-          <button id="popularButton" class="soft-button" type="button">随便逛逛</button>
-          <span id="statusText" class="status">书源：Project Gutenberg</span>
+    <section id="storeView" class="app-view">
+      <div class="toolbar liquid">
+        <div class="search-wrap">
+          <input id="librarySearch" type="search" placeholder="在存所里找书" autocomplete="off" />
         </div>
+        <button id="uploadBookButton" class="primary-button" type="button">上传</button>
+        <input id="bookFileInput" class="hidden" type="file" multiple accept=".txt,.md,.markdown,.epub,.pdf,text/plain,text/markdown,application/epub+zip,application/pdf" />
       </div>
 
-      <section id="resultsSection" class="results-section hidden">
+      <div class="subtoolbar">
+        <div class="segmented liquid" id="readFilter">
+          <button class="segment active" data-filter="all" type="button">全部</button>
+          <button class="segment" data-filter="read" type="button">已读</button>
+          <button class="segment" data-filter="unread" type="button">未读</button>
+        </div>
+        <select id="sortSelect" class="select liquid" aria-label="排序">
+          <option value="lastRead">最近阅读</option>
+          <option value="uploaded">最近上传</option>
+          <option value="title">书名</option>
+        </select>
+      </div>
+
+      <div id="folderBar" class="folder-bar"></div>
+
+      <section id="libraryEmpty" class="empty-state liquid">
+        <p class="eyebrow">Library</p>
+        <h2>这里还空着。</h2>
+        <p>把 TXT、Markdown、EPUB 或 PDF 放进来。封面只用文字，不占你的空间。</p>
+        <button class="primary-button" type="button" data-action="upload">放第一本书</button>
+      </section>
+
+      <section id="bookGrid" class="book-grid hidden"></section>
+    </section>
+
+    <section id="discoverView" class="app-view hidden">
+      <section class="discover-hero liquid">
+        <p class="eyebrow">见闻</p>
+        <h2>去外面看看有什么书。</h2>
+        <p>目前接 Project Gutenberg。它只负责发现公版书，不代替你自己的存所。</p>
+        <form id="discoverForm" class="discover-search">
+          <input id="discoverInput" type="search" placeholder="书名、作者、主题" autocomplete="off" />
+          <button id="discoverButton" class="primary-button" type="submit">搜索</button>
+        </form>
+        <button id="popularButton" class="ghost-button" type="button">随便逛逛</button>
+        <span id="discoverStatus" class="status"></span>
+      </section>
+
+      <section id="discoverResults" class="discover-results hidden">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Bookshelf</p>
-            <h2>找到这些</h2>
+            <h2>外面的书</h2>
           </div>
-          <span id="resultMeta" class="status"></span>
+          <span id="discoverMeta" class="status"></span>
         </div>
-        <div id="resultsGrid" class="book-grid"></div>
-      </section>
-
-      <section class="welcome glass">
-        <p class="eyebrow">Shared reading</p>
-        <h2>这不是一个孤零零的阅读器。</h2>
-        <p>
-          阅读进度、划线和讨论会一点点接进我们的共同状态里。
-          v0.1 先把“找书 → 阅读 → 划线”的手感做顺。
-        </p>
+        <div id="discoverGrid" class="book-grid"></div>
       </section>
     </section>
 
-    <section id="readerView" class="view hidden">
-      <div class="reader-toolbar glass">
-        <button id="backButton" class="soft-button" type="button">返回书架</button>
-        <div class="reader-title-wrap">
-          <p id="readerBookMeta" class="eyebrow"></p>
-          <h2 id="readerTitle">Reading</h2>
-          <p id="readerProgressText" class="status"></p>
-        </div>
-        <button id="highlightsToggle" class="soft-button" type="button">划线 <span id="highlightCount">0</span></button>
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-
-      <article id="readerText" class="reader-paper glass" tabindex="0"></article>
-
-      <div class="reader-controls glass">
-        <button id="previousButton" class="soft-button" type="button">上一段</button>
-        <button id="nextButton" class="primary-button" type="button">继续读</button>
-      </div>
-
-      <aside id="highlightsPanel" class="highlights-panel glass hidden">
-        <div class="section-heading compact">
-          <div>
-            <p class="eyebrow">Highlights</p>
-            <h3>这一页留下的痕迹</h3>
+    <section id="settingsView" class="app-view hidden">
+      <div class="settings-stack">
+        <section class="settings-card liquid">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">阅读</p>
+              <h2>排版与翻页</h2>
+            </div>
           </div>
-          <button id="closeHighlights" class="icon-button" type="button" aria-label="关闭">×</button>
-        </div>
-        <p class="status">目前先保存在本机。下一步接入 Supabase 后，这里会变成我们的共享划线。</p>
-        <div id="highlightList" class="highlight-list"></div>
-      </aside>
+          <div class="setting-grid">
+            <label class="setting-row">
+              <span>主题</span>
+              <select id="themeSetting" class="select">
+                <option value="auto">跟随系统</option>
+                <option value="light">日间</option>
+                <option value="dark">深色</option>
+              </select>
+            </label>
+            <label class="setting-row">
+              <span>浏览方式</span>
+              <select id="readingModeSetting" class="select">
+                <option value="paged">单页分页</option>
+                <option value="scroll">上下滚动</option>
+              </select>
+            </label>
+            <label class="setting-row range-row">
+              <span>字号 <b id="fontSizeValue"></b></span>
+              <input id="fontSizeSetting" type="range" min="14" max="30" step="1" />
+            </label>
+            <label class="setting-row range-row">
+              <span>行间距 <b id="lineHeightValue"></b></span>
+              <input id="lineHeightSetting" type="range" min="1.35" max="2.5" step="0.05" />
+            </label>
+            <label class="setting-row range-row">
+              <span>字间距 <b id="letterSpacingValue"></b></span>
+              <input id="letterSpacingSetting" type="range" min="-0.5" max="3" step="0.1" />
+            </label>
+            <label class="setting-row range-row">
+              <span>正文宽度 <b id="contentWidthValue"></b></span>
+              <input id="contentWidthSetting" type="range" min="520" max="980" step="20" />
+            </label>
+          </div>
+        </section>
 
-      <button id="selectionAction" class="selection-action hidden" type="button">划下来</button>
+        <section class="settings-card liquid">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">翻译</p>
+              <h2>外接 API</h2>
+            </div>
+            <label class="switch"><input id="translationEnabled" type="checkbox" /><span></span></label>
+          </div>
+          <div class="setting-grid">
+            <label class="setting-row stacked">
+              <span>Base URL</span>
+              <input id="translationBaseUrl" type="url" placeholder="https://api.example.com/v1" />
+            </label>
+            <label class="setting-row stacked">
+              <span>API Key</span>
+              <input id="translationApiKey" type="password" placeholder="只保存在这台设备" />
+            </label>
+            <label class="setting-row stacked">
+              <span>Model</span>
+              <input id="translationModel" type="text" placeholder="deepseek-chat" />
+            </label>
+            <label class="setting-row">
+              <span>默认显示</span>
+              <select id="translationDisplayMode" class="select">
+                <option value="both">原文 + 译文</option>
+                <option value="original">只看原文</option>
+                <option value="translation">只看译文</option>
+              </select>
+            </label>
+          </div>
+          <p class="setting-note">API 配置只留在本机；译文以后会进入书房数据层，并记录模型与源文本版本。</p>
+        </section>
+
+        <section class="settings-card liquid">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">Liquid Glass</p>
+              <h2>整间书房的材质</h2>
+            </div>
+            <button id="glassResetButton" class="ghost-button" type="button">恢复默认</button>
+          </div>
+          <div class="preset-row" id="glassPresets">
+            <button class="chip" data-glass-preset="clear" type="button">清透</button>
+            <button class="chip active" data-glass-preset="soft" type="button">柔和</button>
+            <button class="chip" data-glass-preset="deep" type="button">浓厚</button>
+          </div>
+          <div class="setting-grid">
+            <label class="setting-row range-row"><span>模糊 <b id="glassBlurValue"></b></span><input id="glassBlurSetting" type="range" min="4" max="42" step="1" /></label>
+            <label class="setting-row range-row"><span>透明 <b id="glassOpacityValue"></b></span><input id="glassOpacitySetting" type="range" min="0.18" max="0.88" step="0.02" /></label>
+            <label class="setting-row range-row"><span>饱和 <b id="glassSaturationValue"></b></span><input id="glassSaturationSetting" type="range" min="80" max="220" step="5" /></label>
+            <label class="setting-row range-row"><span>高光 <b id="glassHighlightValue"></b></span><input id="glassHighlightSetting" type="range" min="0.08" max="0.8" step="0.02" /></label>
+            <label class="setting-row range-row"><span>圆角 <b id="glassRadiusValue"></b></span><input id="glassRadiusSetting" type="range" min="10" max="38" step="1" /></label>
+            <label class="setting-row stacked"><span>玻璃染色</span><input id="glassTintSetting" type="color" value="#dcefff" /></label>
+          </div>
+        </section>
+
+        <section class="settings-card liquid">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">数据</p>
+              <h2>带得走的书房</h2>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="exportDataButton" class="ghost-button" type="button">导出阅读数据</button>
+            <button id="createFolderButton" class="ghost-button" type="button">新建文件夹</button>
+          </div>
+          <p class="setting-note">书本原文件保存在浏览器本地数据库。云同步与多用户后端随后接入。</p>
+        </section>
+      </div>
     </section>
   </main>
 
-  <script src="./app.js" defer></script>
+  <nav class="bottom-nav liquid" aria-label="主导航">
+    <button class="nav-item active" data-view="store" type="button">
+      <span class="nav-icon">▤</span><span>存所</span>
+    </button>
+    <button class="nav-item" data-view="discover" type="button">
+      <span class="nav-icon">⌕</span><span>见闻</span>
+    </button>
+    <button class="nav-item" data-view="settings" type="button">
+      <span class="nav-icon">◫</span><span>衡准</span>
+    </button>
+  </nav>
+
+  <section id="bookDetail" class="sheet hidden" aria-modal="true" role="dialog">
+    <div class="sheet-backdrop" data-close="bookDetail"></div>
+    <div class="sheet-panel liquid">
+      <button class="sheet-close" data-close="bookDetail" type="button">×</button>
+      <div id="detailCover" class="detail-cover"></div>
+      <div class="detail-copy">
+        <p id="detailMeta" class="eyebrow"></p>
+        <h2 id="detailTitle"></h2>
+        <p id="detailDescription" class="detail-description"></p>
+        <div class="detail-actions">
+          <button id="detailReadButton" class="primary-button" type="button">继续阅读</button>
+          <button id="detailFolderButton" class="ghost-button" type="button">归类</button>
+          <button id="detailDeleteButton" class="danger-button" type="button">删除</button>
+        </div>
+      </div>
+      <div class="detail-tabs">
+        <button class="detail-tab active" data-detail-tab="chapters" type="button">目录</button>
+        <button class="detail-tab" data-detail-tab="notes" type="button">评论记录</button>
+        <button class="detail-tab" data-detail-tab="story" type="button">叙说</button>
+      </div>
+      <div id="detailTabBody" class="detail-tab-body"></div>
+    </div>
+  </section>
+
+  <section id="readerView" class="reader-view hidden">
+    <header class="reader-topbar liquid">
+      <button id="readerBackButton" class="ghost-button" type="button">返回</button>
+      <div class="reader-heading">
+        <p id="readerMeta" class="eyebrow"></p>
+        <h2 id="readerTitle"></h2>
+        <p id="readerProgress" class="status"></p>
+      </div>
+      <button id="readerNotesButton" class="ghost-button" type="button">划线</button>
+    </header>
+
+    <div class="reader-progress-track"><div id="readerProgressBar"></div></div>
+
+    <article id="readerPaper" class="reader-paper"></article>
+
+    <footer class="reader-footer liquid">
+      <button id="readerPrevButton" class="ghost-button" type="button">上一页</button>
+      <button id="readerChapterButton" class="ghost-button" type="button">目录</button>
+      <button id="readerNextButton" class="primary-button" type="button">下一页</button>
+    </footer>
+
+    <button id="selectionButton" class="selection-button hidden" type="button">划下来</button>
+  </section>
+
+  <section id="noteComposer" class="sheet hidden" aria-modal="true" role="dialog">
+    <div class="sheet-backdrop" data-close="noteComposer"></div>
+    <div class="note-panel liquid">
+      <button class="sheet-close" data-close="noteComposer" type="button">×</button>
+      <p class="eyebrow">留下痕迹</p>
+      <blockquote id="noteQuote"></blockquote>
+      <div class="highlight-colors" id="highlightColors">
+        <button class="highlight-color active" data-color="blue" type="button" aria-label="雾蓝"></button>
+        <button class="highlight-color" data-color="sage" type="button" aria-label="鼠尾草"></button>
+        <button class="highlight-color" data-color="rose" type="button" aria-label="灰粉"></button>
+        <button class="highlight-color" data-color="sand" type="button" aria-label="沙金"></button>
+      </div>
+      <textarea id="noteText" rows="4" placeholder="可以什么都不写，也可以给这一句留张小纸条。"></textarea>
+      <button id="saveNoteButton" class="primary-button" type="button">保存</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast liquid hidden"></div>
+
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
