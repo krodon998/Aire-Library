@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#dff1ff" />
   <meta name="color-scheme" content="light dark" />
   <title>Aire Library</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />\n  <link rel="icon" href="./icon.svg" type="image/svg+xml" />\n  <link rel="apple-touch-icon" href="./icon.svg" />\n  <link rel="stylesheet" href="./styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
@@ -279,6 +279,6 @@
 
   <div id="toast" class="toast liquid hidden"></div>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js"></script>\n  <script>\n    if ("serviceWorker" in navigator) {\n      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));\n    }\n  </script>
 </body>
 </html>
